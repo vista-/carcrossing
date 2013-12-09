@@ -14,14 +14,14 @@ namespace CrossingSimulation
         const int first_line_len = 3;
         public struct Car
         {
-            int inTime;
-            int outTime;
-            int position;
+            public int inTime;
+            public int outTime;
+            public int position;
             public Car(int a, int len)
             {
                 inTime = a;
                 outTime = 0;
-                position = (-1 * len) - 1;
+                position = (len / -2) - 2 ;
             }
         }
         static void Main(string[] args)
@@ -47,8 +47,101 @@ namespace CrossingSimulation
                upper_cars[i] = new Car(data[2][i], length);
             }
             Console.WriteLine("Total {0} cars generated, {1} coming from left, {2} coming from above.", left_car_count + upper_car_count, left_car_count, upper_car_count);
+            //now to simulate this entire thing
+            int time = 0;
+            while ((left_cars[left_car_count - 1].outTime == 0) || (upper_cars[upper_car_count - 1].outTime == 0))
+            {
+                time++;
+                for (int i = 0; i < left_car_count; i++)
+                {
+                    if (i == 0)
+                    {
+                        if (left_cars[0].outTime >= time)
+                        {
+                            if (!(left_cars[0].position == -1 || left_cars[1].position == -2) || passesCrossing(upper_cars, upper_car_count, true))
+                            {
+                                left_cars[0].position += 1;
+                                if (left_cars[0].position == length + 1)
+                                {
+                                    left_cars[0].outTime = time;
+                                    Console.WriteLine("Left car no.{0} has left at {1}", i + 1, time);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (left_cars[i].outTime >= time && i != 1)
+                        {
+                            int distance = Math.Abs(left_cars[i].position - left_cars[i - 1].position);
+                            if (distance >= 2 || distance == 0 || left_cars[i - 1].position == length + 1)
+                            {
+                                if (!(left_cars[i].position == -1 || left_cars[i].position == -2) || passesCrossing(upper_cars, upper_car_count, true))
+                                {
+                                    left_cars[i].position += 1;
+                                    if (left_cars[i].position == length + 1)
+                                    {
+                                        left_cars[i].outTime = time;
+                                        Console.WriteLine("Left car no.{0} has left at {1}", i + 1, time);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < upper_car_count; i++)
+                {
+                    if (i == 0)
+                    {
+                        if (upper_cars[0].outTime >= time)
+                        {
+                            if (!(upper_cars[0].position == -1 || upper_cars[0].position == -2) || passesCrossing(left_cars, left_car_count, false))
+                            {
+                                upper_cars[0].position += 1;
+                                if (upper_cars[0].position == length + 1)
+                                {
+                                    upper_cars[0].outTime = time;
+                                    Console.WriteLine("Upper car no.{0} has left at {1}", i + 1, time);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (upper_cars[i].outTime >= time && i != 1)
+                        {
+                            int distance = Math.Abs(upper_cars[i].position - upper_cars[i - 1].position);
+                            if (distance >= 2 || distance == 0 || upper_cars[i - 1].position == length + 1)
+                            {
+                                if (!(upper_cars[i].position == -1 || upper_cars[i].position == -2) || passesCrossing(left_cars, left_car_count, false))
+                                {
+                                    upper_cars[i].position += 1;
+                                    if (upper_cars[i].position == length + 1)
+                                    {
+                                        upper_cars[i].outTime = time;
+                                        Console.WriteLine("Upper car no.{0} has left at {1}", i + 1, time);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             Console.ReadLine();
+        }
+
+        private static bool passesCrossing(Car[] cars, int len, bool priority)
+        {
+            bool passes = true;
+                for (int i = 0; i < len; i++)
+                {
+                    if(cars[i].position == -1 || (cars[i].position == -2 && !priority))
+                    {
+                        passes = false;
+                    }
+                }
+           return passes;
         }
 
         private static void writeOutput()
