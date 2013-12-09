@@ -27,25 +27,28 @@ namespace CrossingSimulation
         static void Main(string[] args)
         {
             //read the variables
-            int[][] datums = new int[3][];
-            datums = readInput();
-            int length = (datums[0][0] * 2) + 1;
+            int[][] data = new int[3][];
+            data = readInput();
+            int length = (data[0][0] * 2) + 1;
             int[] left_road = new int[length];
             int[] upper_road = new int[length];
-            int left_car_count = datums[0][1];
-            int upper_car_count = datums[0][2];
+            int left_car_count = data[0][1];
+            int upper_car_count = data[0][2];
+            Console.WriteLine("Data read, beginning object creation...");
             //car array constructor
             Car[] left_cars = new Car[left_car_count];
             for (int i = 0; i < (left_car_count - 1) ; i++)
             {
-                left_cars[i] = new Car(datums[1][i], length);
+                left_cars[i] = new Car(data[1][i], length);
             }
             Car[] upper_cars = new Car[upper_car_count];
             for (int i = 0; i < (upper_car_count - 1); i++)
             {
-               upper_cars[i] = new Car(datums[2][i], length);
+               upper_cars[i] = new Car(data[2][i], length);
             }
-            
+            Console.WriteLine("Total {0} cars generated, {1} coming from left, {2} coming from above.", left_car_count + upper_car_count, left_car_count, upper_car_count);
+
+            Console.ReadLine();
         }
 
         private static void writeOutput()
@@ -84,7 +87,11 @@ namespace CrossingSimulation
             for (int i = 0; i < len; i++)
             {
                 data[i] = Convert.ToInt16(reader.Read());
-                if (i == len) break;
+                if (i == len) 
+                {
+                    Console.WriteLine("{0} datum read", i);
+                    break;
+                }
                 reader.Read();
             }
             return data;
