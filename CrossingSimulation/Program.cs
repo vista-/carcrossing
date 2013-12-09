@@ -58,7 +58,7 @@ namespace CrossingSimulation
                     {
                         if (left_cars[0].outTime >= time)
                         {
-                            if (!(left_cars[0].position == -1 || left_cars[1].position == -2) || passesCrossing(upper_cars, upper_car_count, true))
+                            if (!(left_cars[0].position == -1 || left_cars[1].position == -2) || passesCrossing(upper_cars, true))
                             {
                                 left_cars[0].position += 1;
                                 if (left_cars[0].position == length + 1)
@@ -76,7 +76,7 @@ namespace CrossingSimulation
                             int distance = Math.Abs(left_cars[i].position - left_cars[i - 1].position);
                             if (distance >= 2 || distance == 0 || left_cars[i - 1].position == length + 1)
                             {
-                                if (!(left_cars[i].position == -1 || left_cars[i].position == -2) || passesCrossing(upper_cars, upper_car_count, true))
+                                if (!(left_cars[i].position == -1 || left_cars[i].position == -2) || passesCrossing(upper_cars, true))
                                 {
                                     left_cars[i].position += 1;
                                     if (left_cars[i].position == length + 1)
@@ -95,7 +95,7 @@ namespace CrossingSimulation
                     {
                         if (upper_cars[0].outTime >= time)
                         {
-                            if (!(upper_cars[0].position == -1 || upper_cars[0].position == -2) || passesCrossing(left_cars, left_car_count, false))
+                            if (!(upper_cars[0].position == -1 || upper_cars[0].position == -2) || passesCrossing(left_cars, false))
                             {
                                 upper_cars[0].position += 1;
                                 if (upper_cars[0].position == length + 1)
@@ -113,7 +113,7 @@ namespace CrossingSimulation
                             int distance = Math.Abs(upper_cars[i].position - upper_cars[i - 1].position);
                             if (distance >= 2 || distance == 0 || upper_cars[i - 1].position == length + 1)
                             {
-                                if (!(upper_cars[i].position == -1 || upper_cars[i].position == -2) || passesCrossing(left_cars, left_car_count, false))
+                                if (!(upper_cars[i].position == -1 || upper_cars[i].position == -2) || passesCrossing(left_cars, false))
                                 {
                                     upper_cars[i].position += 1;
                                     if (upper_cars[i].position == length + 1)
@@ -127,14 +127,16 @@ namespace CrossingSimulation
                     }
                 }
             }
+            //writing the output
+            writeOutput(left_cars, upper_cars);
 
             Console.ReadLine();
         }
 
-        private static bool passesCrossing(Car[] cars, int len, bool priority)
+        private static bool passesCrossing(Car[] cars, bool priority)
         {
             bool passes = true;
-                for (int i = 0; i < len; i++)
+                for (int i = 0; i < cars.Length + 1; i++)
                 {
                     if(cars[i].position == -1 || (cars[i].position == -2 && !priority))
                     {
@@ -144,9 +146,29 @@ namespace CrossingSimulation
            return passes;
         }
 
-        private static void writeOutput()
+        private static void writeOutput(Car[] data1, Car[] data2)
         {
-            throw new NotImplementedException();
+            //write data to file "auto.ki"
+            StreamWriter writer = new StreamWriter("auto.ki");
+            sequentialWrite(writer, data1);
+            writer.WriteLine();
+            sequentialWrite(writer, data2);
+
+            writer.Close();
+        }
+
+        private static void sequentialWrite(StreamWriter writer, Car[] data)
+        {
+            for (int i = 0; i < data.Length + 1; i++)
+            {
+                writer.Write(Convert.ToString(data[i].outTime));
+                if(i == data.Length)
+                {
+                    Console.Write("Written {0} out times.", i);
+                    break;
+                }
+                writer.Write(" ");
+            }
         }
 
         private static int[][] readInput()
@@ -154,15 +176,15 @@ namespace CrossingSimulation
             //read the data in from file "auto.be"
             int[] init_data = new int[first_line_len];
             StreamReader reader = new StreamReader("auto.be");
-            init_data = sequentialRead(reader, first_line_len - 1);
+            init_data = sequentialRead(reader, first_line_len);
 
             int left_car_count = init_data[1];
             int[] left_cars = new int[left_car_count];
-            left_cars = sequentialRead(reader, left_car_count - 1);
+            left_cars = sequentialRead(reader, left_car_count);
 
             int upper_car_count = init_data[2];
             int[] upper_cars = new int[upper_car_count];
-            upper_cars = sequentialRead(reader, upper_car_count - 1);
+            upper_cars = sequentialRead(reader, upper_car_count);
 
             reader.Close();
             //prep for export
@@ -180,7 +202,7 @@ namespace CrossingSimulation
             for (int i = 0; i < len; i++)
             {
                 data[i] = Convert.ToInt16(reader.Read());
-                if (i == len) 
+                if (i == (len - 1)) 
                 {
                     Console.WriteLine("{0} datum read", i);
                     break;
@@ -189,5 +211,6 @@ namespace CrossingSimulation
             }
             return data;
         }
+
     }
 }
